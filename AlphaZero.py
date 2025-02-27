@@ -644,7 +644,7 @@ if __name__ == "__main__":
     print("1. Train AlphaZero from scratch")
     print("2. Continue training AlphaZero")
     print("3. Play against AlphaZero")
-    choice = 1
+    choice = "1"
 
     if choice == "1":
         num_games = 10000
