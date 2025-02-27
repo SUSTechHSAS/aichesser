@@ -644,12 +644,12 @@ if __name__ == "__main__":
     print("1. Train AlphaZero from scratch")
     print("2. Continue training AlphaZero")
     print("3. Play against AlphaZero")
-    choice = input("Enter your choice (1/2/3): ")
+    choice = 1
 
     if choice == "1":
-        num_games = int(input("Enter number of self-play games for each iteration: "))
-        num_iterations = int(input("Enter number of training iterations: "))
-        model_save_path = input("Enter model save path (e.g., models/alphazero_model): ")
+        num_games = 10000
+        num_iterations = 1
+        model_save_path = '.'
         
         
         alphazero = AlphaZero()
