@@ -1,0 +1,26 @@
+name: Building
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-on-linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pre
+      run: pip install keras
+
+    - name: run
+      run: python3 ./AlphaZero.py
+      
+
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: iter
+        path: ./*
