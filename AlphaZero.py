@@ -647,7 +647,7 @@ if __name__ == "__main__":
     choice = "1"
 
     if choice == "1":
-        num_games = 10000
+        num_games = 2500
         num_iterations = 1
         model_save_path = '.'
         
