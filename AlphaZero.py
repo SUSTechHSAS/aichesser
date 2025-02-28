@@ -647,9 +647,9 @@ if __name__ == "__main__":
     choice = "1"
 
     if choice == "1":
-        num_games = 1
+        num_games = 2000
         num_iterations = 1
-        model_save_path = '.'
+        model_save_path = './res.h5'
         
         
         alphazero = AlphaZero()
