@@ -42,7 +42,7 @@ jobs:
         repository: SUSTechHSAS/aichesser-model
         directory: ./aichesser-model
         github_token: ${{ secrets.MODEL_CONTENT_TOKEN }}
-        forve: true
+        force: true
 
 
     - name: Upload a Build Artifact
