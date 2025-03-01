@@ -649,7 +649,7 @@ if __name__ == "__main__":
     if choice == "1":
         num_games = 200
         num_iterations = 1
-        model_save_path = './res.h5'
+        model_save_path = './res'
         
         
         alphazero = AlphaZero()
@@ -657,7 +657,7 @@ if __name__ == "__main__":
             print(f"Iteration: {i+1}/{num_iterations}")
             training_data = alphazero.self_play(num_games)
             alphazero.train(training_data)
-            alphazero.save_model(model_save_path + f"_iteration_{i+1}")
+            alphazero.save_model(model_save_path + f"_iteration_{i+1}.h5")
 
     elif choice == "2":
         num_games = int(input("Enter number of self-play games for each iteration: "))
