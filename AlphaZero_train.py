@@ -664,7 +664,7 @@ if __name__ == "__main__":
     elif choice == "2":
         num_games = 20
         num_iterations = 20
-        model_load_path = "./aichesser-model/res.teras"
+        model_load_path = "./aichesser-model/res.keras"
         model_save_path = "./res"
         
         
@@ -673,7 +673,7 @@ if __name__ == "__main__":
             print(f"Iteration: {i+1}/{num_iterations}")
             training_data = alphazero.self_play(num_games)
             alphazero.train(training_data)
-            alphazero.save_model(model_save_path + f"_iteration_{i+1}.teras")
+            alphazero.save_model(model_save_path + f"_iteration_{i+1}.keras")
             
         alphazero.save_model("./res.keras")
 
