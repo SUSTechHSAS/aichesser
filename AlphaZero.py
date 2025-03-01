@@ -647,8 +647,8 @@ if __name__ == "__main__":
     choice = "1"
 
     if choice == "1":
-        num_games = 200
-        num_iterations = 1
+        num_games = 10
+        num_iterations = 10
         model_save_path = './res'
         
         
