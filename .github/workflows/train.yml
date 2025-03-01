@@ -2,9 +2,8 @@ name: Train
 
 on:
   workflow_dispatch:
-  push:
   schedule:
-    - cron:  '30 0,5,10,15,20 * * *'
+    - cron:  '30 0,6,12,18 * * *'
 
 jobs:
   build-on-linux:
@@ -21,7 +20,7 @@ jobs:
       run: git clone https://github.com/SUSTechHSAS/aichesser-model.git
         
     - name: run
-      run: python3 ./AlphaZero_train.py
+      run: python3 ./AlphaZero_train.py 5 500 4 ./aichesser-model/res.keras res.keras
 
     - name: commit
       env:
