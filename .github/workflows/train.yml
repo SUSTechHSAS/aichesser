@@ -1,0 +1,52 @@
+name: Train
+
+on:
+  workflow_dispatch:
+  push:
+  schedule:
+    - cron:  '30 5,17 * * *'
+
+jobs:
+  build-on-linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pre
+      run: pip install keras tensorflow
+
+    - name: get-model
+      run: git clone https://github.com/SUSTechHSAS/aichesser-model.git
+        
+    - name: run
+      run: python3 ./AlphaZero_train.py
+
+    - name: commit
+      env:
+        TOKEN: ${{ secrets.MODEL_CONTENT_TOKEN }}
+      run: |
+        mv ./aichesser-model/res.keras ./last.keras
+        mv ./res.keras ./aichesser-model
+        echo update >> ./temp.txt
+        cd aichesser-model
+        git config --global user.email hsas2025@outlook.com
+        git config --global user.name hsas2025
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false add --ignore-errors -A -f -- res.keras
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false commit -F ../temp.txt --
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        repository: SUSTechHSAS/aichesser-model
+        directory: ./aichesser-model
+        github_token: ${{ secrets.MODEL_CONTENT_TOKEN }}
+        forve: true
+
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: iter
+        path: ./*
