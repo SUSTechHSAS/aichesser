@@ -31,8 +31,8 @@ jobs:
         mv ./res.keras ./aichesser-model
         echo update >> ./temp.txt
         cd aichesser-model
-        git config --global user.email hsas2025@outlook.com
-        git config --global user.name hsas2025
+        git config --global user.email "41898282+github-actions[bot]@sustechhsas.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false add --ignore-errors -A -f -- res.keras
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false commit -F ../temp.txt --
 
