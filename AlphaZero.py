@@ -657,7 +657,9 @@ if __name__ == "__main__":
             print(f"Iteration: {i+1}/{num_iterations}")
             training_data = alphazero.self_play(num_games)
             alphazero.train(training_data)
-            alphazero.save_model(model_save_path + f"_iteration_{i+1}.h5")
+            alphazero.save_model(model_save_path + f"_iteration_{i+1}.keras")
+
+        alphazero.save_model("./res.keras")
 
     elif choice == "2":
         num_games = int(input("Enter number of self-play games for each iteration: "))
