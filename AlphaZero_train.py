@@ -662,8 +662,8 @@ if __name__ == "__main__":
         alphazero.save_model("./res.keras")
 
     elif choice == "2":
-        num_games = 20
-        num_iterations = 20
+        num_games = 1
+        num_iterations = 1
         model_load_path = "./aichesser-model/res.keras"
         model_save_path = "./res"
         
