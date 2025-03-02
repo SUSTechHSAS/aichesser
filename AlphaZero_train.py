@@ -604,9 +604,9 @@ class AlphaZero:
                        epochs=epochs, batch_size=batch_size, verbose=1)
 
     def play_against_human(self, human_starts=True):
-
         game = Game()
         game.initialize_board()
+        states, policy_targets, value_targets = [], [], []
 
         while True:
             print("Current Board:")
@@ -615,7 +615,6 @@ class AlphaZero:
 
             if (game.currentPlayer == PLAYER_X and human_starts) or \
                (game.currentPlayer == PLAYER_O and not human_starts):
-
                 try:
                     row, col = map(int, input("Enter your move (row col): ").split())
                     if (row, col) not in game.get_valid_moves():
@@ -625,14 +624,20 @@ class AlphaZero:
                     print("Invalid input! Please enter two numbers separated by a space.")
                     continue
                 winner = game.make_move(row, col)
+                states.append(game.get_state())
+                policy_target = np.zeros(BOARD_SIZE * BOARD_SIZE)
+                policy_target[row * BOARD_SIZE + col] = 1
+                policy_targets.append(policy_target)
             else:
-
                 state = game.get_state()
                 action_probs = self.get_action_probs(state)
                 action = np.unravel_index(np.argmax(action_probs), action_probs.shape)
                 print(f"AI moves to: ({action[0]}, {action[1]})")
                 winner = game.make_move(action[0], action[1])
-
+                states.append(state)
+                policy_target = np.zeros(BOARD_SIZE * BOARD_SIZE)
+                policy_target[action[0] * BOARD_SIZE + action[1]] = 1
+                policy_targets.append(policy_target)
 
             if winner is not None:
                 print("Final Board:")
@@ -640,9 +645,81 @@ class AlphaZero:
                     print([cell['type'] for cell in row])
                 if winner == 'Draw':
                     print("It's a draw!")
+                    value = 0
                 else:
                     print(f"Winner: {winner}")
+                    value = 1 if winner == game.currentPlayer else -1
+                value_targets = [value] * len(states)
                 break
+
+        return list(zip(states, policy_targets, value_targets))
+
+    def play_against_random(self, num_games=1, human_starts=True):
+        training_data = []
+        for _ in range(num_games):
+            game = Game()
+            game.initialize_board()
+            states, policy_targets, value_targets = [], [], []
+
+            while True:
+                print("Current Board:")
+                for row in game.board:
+                    print([cell['type'] for cell in row])
+
+                if (game.currentPlayer == PLAYER_X and human_starts) or \
+                   (game.currentPlayer == PLAYER_O and not human_starts):
+                    row = random.randint(0, BOARD_SIZE - 1)
+                    col = random.randint(0, BOARD_SIZE - 1)
+                    while (row, col) not in game.get_valid_moves():
+                        row = random.randint(0, BOARD_SIZE - 1)
+                        col = random.randint(0, BOARD_SIZE - 1)
+
+                    winner = game.make_move(row, col)
+                    states.append(game.get_state())
+                    policy_target = np.zeros(BOARD_SIZE * BOARD_SIZE)
+                    policy_target[row * BOARD_SIZE + col] = 1
+                    policy_targets.append(policy_target)
+                else:
+                    # state = game.get_state()
+                    # action_probs = self.get_action_probs(state)
+                    # action = np.unravel_index(np.argmax(action_probs), action_probs.shape)
+                    row = random.randint(0, BOARD_SIZE - 1)
+                    col = random.randint(0, BOARD_SIZE - 1)
+                    while (row, col) not in game.get_valid_moves():
+                        row = random.randint(0, BOARD_SIZE - 1)
+                        col = random.randint(0, BOARD_SIZE - 1)
+                    winner = game.make_move(row, col)
+                    states.append(game.get_state())
+                    policy_target = np.zeros(BOARD_SIZE * BOARD_SIZE)
+                    policy_target[row * BOARD_SIZE + col] = 1
+                    policy_targets.append(policy_target)
+
+                if winner is not None:
+
+                    value = 1 if winner == game.currentPlayer else -1
+                    value_targets.extend([value] * len(states))
+
+
+                    flipped_states = [np.where(s == 1, -1, np.where(s == -1, 1, s)) for s in states]
+                    flipped_policy_targets = [np.flip(pt) for pt in policy_targets]
+
+
+                    training_data.extend(list(zip(flipped_states, flipped_policy_targets, [-v for v in value_targets])))
+
+                    print("Final Board:")
+                    for row in game.board:
+                        print([cell['type'] for cell in row])
+                    if winner == 'Draw':
+                        print("It's a draw!")
+                        value = 0
+                    else:
+                        print(f"Winner: {winner}")
+                        value = 1 if winner == game.currentPlayer else -1
+                    value_targets = [value] * len(states)
+                    break
+
+            training_data.extend(list(zip(states, policy_targets, value_targets)))
+        return training_data
 
 def save_training_data(training_data, filepath):
     """
@@ -707,12 +784,15 @@ if __name__ == "__main__":
         alphazero.save_model(model_save_path)
 
     elif choice == "3":
-        model_load_path = input("Enter model load path (e.g., models/alphazero_model_iteration_10): ")
+        model_load_path = sys.argv[2]
+        model_save_path = (sys.argv[3] if input("Train? (y): ").lower() == 'y' else False)
         human_starts = input("Do you want to start first? (y/n): ").lower() == 'y'
 
-
         alphazero = AlphaZero(model_path=model_load_path)
-        alphazero.play_against_human(human_starts=human_starts)
+        training_data = alphazero.play_against_human(human_starts=human_starts)
+        if model_save_path != False:
+            alphazero.train(training_data)
+            alphazero.save_model(model_save_path)
 
     elif choice == "4":
         num_games = int(sys.argv[2])
@@ -743,6 +823,18 @@ if __name__ == "__main__":
             training_data = load_training_data(f"data{i}.pk1")
             alphazero.train(training_data)
             alphazero.save_model(model_save_path + f"_iteration_{i+1}.keras")
+
+        alphazero.save_model(model_save_path)
+
+    elif choice == "6":
+        game_num = int(sys.argv[2])
+        model_load_path = sys.argv[3]
+        model_save_path = sys.argv[4]
+
+        alphazero = AlphaZero(model_path=model_load_path)
+
+        training_data = alphazero.play_against_random(game_num)
+        alphazero.train(training_data)
 
         alphazero.save_model(model_save_path)
 
