@@ -734,7 +734,7 @@ if __name__ == "__main__":
 
         for i in range(num_iterations):
             print(f"Iteration: {i+1}/{num_iterations}")
-            process_list.append(subprocess.Popen(["python3", "data_gen.py", "4", f"{num_games}", model_load_path, f"data{i}.pk1"]))
+            process_list.append(subprocess.Popen(["python3", "AlphaZero_train.py", "4", f"{num_games}", model_load_path, f"data{i}.pk1"]))
 
         alphazero = AlphaZero(model_path=model_load_path)
 
