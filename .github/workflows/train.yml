@@ -20,7 +20,7 @@ jobs:
       run: git clone https://github.com/SUSTechHSAS/aichesser-model.git
         
     - name: run
-      run: python3 ./AlphaZero_train.py 5 400 4 ./aichesser-model/res.keras res.keras
+      run: python3 ./AlphaZero_train.py 5 450 4 ./aichesser-model/res.keras res.keras
 
     - name: commit
       env:
